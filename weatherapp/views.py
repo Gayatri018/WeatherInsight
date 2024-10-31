@@ -1,6 +1,7 @@
 from django.shortcuts import render
 import json
 import urllib.request
+import os
 
 # Create your views here.
 
@@ -10,7 +11,9 @@ def index(request):
     if request.method == 'POST':
         city = request.POST["city"]
         try:
-            res = urllib.request.urlopen('https://api.openweathermap.org/data/2.5/weather?q=' + city + '&appid=910d6fb8ced682466aff481f783a10cb').read()
+            # Use the API key from environment variables
+            api_key = os.getenv("API_KEY")
+            res = urllib.request.urlopen(f'https://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}').read()
             json_data = json.loads(res)
             data = {
                 "country_code": str(json_data['sys']['country']),
@@ -23,7 +26,4 @@ def index(request):
         except Exception as e:
             data['error'] = str(e)  
         
-            
-            
-
-    return render(request, 'index.html', {'city': city, 'data': data})  
+    return render(request, 'index.html', {'city': city, 'data': data})
